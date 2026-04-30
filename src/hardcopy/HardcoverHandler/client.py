@@ -5,8 +5,25 @@ ENDPOINT = "https://api.hardcover.app/v1/graphql"
 _FOLLOWED_BOOKS_QUERY = """
 {
   me {
-    follows(where: { followable_type: { _eq: "Book" } }) {
+    book_follows: follows(where: { followable_type: { _eq: "Book" } }) {
       book { title }
+    }
+    series_follows: follows(where: { followable_type: { _eq: "Series" } }) {
+      series {
+        book_series(
+          distinct_on: position
+          order_by: [{ position: asc }, { book: { users_count: desc } }]
+          where: {
+            compilation: { _eq: false }
+            book: {
+              canonical_id: { _is_null: true }
+              is_partial_book: { _eq: false }
+            }
+          }
+        ) {
+          book { title }
+        }
+      }
     }
   }
 }
@@ -51,11 +68,20 @@ def get_followed_books(api_key: str) -> list[str]:
     me = data["me"]
     if not me:
         return []
-    return [
-        f["book"]["title"]
-        for f in me[0]["follows"]
-        if f.get("book") and f["book"].get("title")
-    ]
+    titles: list[str] = []
+    for f in me[0]["book_follows"]:
+        book = f.get("book") or {}
+        title = book.get("title")
+        if title:
+            titles.append(title)
+    for f in me[0]["series_follows"]:
+        series = f.get("series") or {}
+        for row in series.get("book_series") or []:
+            book = row.get("book") or {}
+            title = book.get("title")
+            if title:
+                titles.append(title)
+    return list(dict.fromkeys(titles))
 
 
 def get_books_in_a_series(api_key: str, series_id: str) -> list[str]:
