@@ -1,3 +1,3 @@
-from .client import ENDPOINT, get_followed_books
+from .client import get_followed_books
 
-__all__ = ["ENDPOINT", "get_followed_books"]
+__all__ = ["get_followed_books"]

@@ -21,6 +21,7 @@ fetch data from hardcover using a passed key.
 | id | st | desc | cites |
 |----|----|----|----|
 | t1 | x | scaffold module | C1 |
+| t2 | x | implement followed books function | I.api |
 
 ## B - bugs
 | id | date | cause | fix |
