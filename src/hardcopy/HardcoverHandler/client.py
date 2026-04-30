@@ -14,6 +14,7 @@ _FOLLOWED_BOOKS_QUERY = """
           distinct_on: position
           order_by: [{ position: asc }, { book: { users_count: desc } }]
           where: {
+            position: { _is_null: false }
             compilation: { _eq: false }
             book: {
               canonical_id: { _is_null: true }
@@ -36,6 +37,7 @@ query BooksInSeries($id: Int!) {
     order_by: [{ position: asc }, { book: { users_count: desc } }]
     where: {
       series_id: { _eq: $id }
+      position: { _is_null: false }
       compilation: { _eq: false }
       book: {
         canonical_id: { _is_null: true }
