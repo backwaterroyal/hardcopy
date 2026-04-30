@@ -25,8 +25,10 @@ fetch data from hardcover using a passed key.
 | t1 | x | scaffold module | C1 |
 | t2 | x | implement followed books function | I.api |
 | t3 | x | integration test for existing code | V1
+| t4 | x | fix query to me.follows where followable_type=Book | I.api,B1 |
 
 ## B - bugs
 | id | date | cause | fix |
 |----|----|----|----|
+| b1 | 2026-04-30 | used root `followed_user_books`; returned empty for real users. follow data lives in polymorphic `follows` scoped via `me` filtered by followable_type=Book | t4 |
 

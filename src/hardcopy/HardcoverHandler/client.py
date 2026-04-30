@@ -2,7 +2,15 @@ import httpx
 
 ENDPOINT = "https://api.hardcover.app/v1/graphql"
 
-_QUERY = "{ followed_user_books { book { title } } }"
+_QUERY = """
+{
+  me {
+    follows(where: { followable_type: { _eq: "Book" } }) {
+      book { title }
+    }
+  }
+}
+"""
 
 
 def get_followed_books(api_key: str) -> list[str]:
@@ -16,5 +24,11 @@ def get_followed_books(api_key: str) -> list[str]:
     payload = response.json()
     if "errors" in payload:
         raise RuntimeError(f"hardcover graphql errors: {payload['errors']}")
-    rows = payload["data"]["followed_user_books"]
-    return [row["book"]["title"] for row in rows if row.get("book") and row["book"].get("title")]
+    me = payload["data"]["me"]
+    if not me:
+        return []
+    return [
+        f["book"]["title"]
+        for f in me[0]["follows"]
+        if f.get("book") and f["book"].get("title")
+    ]
